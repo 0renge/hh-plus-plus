@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name			Hentai Heroes++ Harem Information
 // @description		HH++ but only the Harem Information module
-// @version			0.0.1
+// @version			0.0.2
 // @match			https://www.hentaiheroes.com/*
 // @match			https://nutaku.haremheroes.com/*
 // @match			https://eroges.hentaiheroes.com/*
@@ -11,6 +11,8 @@
 // @match			https://www.comixharem.com/*
 // @match			https://nutaku.comixharem.com/*
 // @run-at			document-end
+// @updateURL		https://raw.githubusercontent.com/45026831/hh-plus-plus/release/harem-info-only/hh-plus-plus.js
+// @downloadURL		https://raw.githubusercontent.com/45026831/hh-plus-plus/release/harem-info-only/hh-plus-plus.js
 // @grant			none
 // @author			Raphael, 1121, Sluimerstand, shal, Tom208, test_anon
 // ==/UserScript==
@@ -18,7 +20,7 @@
 /*	===========
 	 CHANGELOG
 	=========== */
-
+// 0.0.2: Fixing harem info details panel hooks disconnecting when sorting.
 // 0.0.1 Extracting only the harem info module from HH++
 
 
@@ -482,11 +484,22 @@ function moduleHarem() {
             nThousand(kobans) + ' <span class="imgKobans"></span><br />';
     }
 
-    $('.girls_list div[id_girl]').click(function() {
-        updateInfo();
-    });
+    function setupListeners () {
+        $('.girls_list div[id_girl]').click(function() {
+            updateInfo();
+        });
 
-    updateInfo();
+        updateInfo();
+    }
+
+    var observer = new MutationObserver(function() {
+        setTimeout(setupListeners, 100);
+    });
+    observer.observe($('.girls_list')[0], {
+        childList: true
+    })
+
+    setupListeners();
 
     function updateInfo() {
         setTimeout(function () {
